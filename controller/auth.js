@@ -1,19 +1,46 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 const { User }  = require("./../models/auth");
+const { success } = require("zod");
+
+const saltRounds = 10;
 
 const signupHandler = async (req,res) => {
     /*
         check if email already exists
         password hash with salt and crypto
         save stuff in db
-        generate jwt token
-        set cookie 
         respond back
     */
 
     const { name, email, password } = req.body;
     const emailCheck = await User.findOne({email:email});
-    console.log(emailCheck)
+    if(emailCheck !== null){
+        return res.status(400).json({
+            success:false,
+            message:"Email already exists"
+        })
+    }
+
+    bcrypt.hash(password, saltRounds, async function (err, hash) {
+        const user =  new User({name, email, passwordHash : hash});
+        const response = await user.save();
+        if(response){
+            return res.status(200).json({
+                success: true,
+                message: "Account created successfully.",
+                verified : response.verified
+            })
+        }
+        else{
+            // TODO: raise global error from here
+            return res.status(400).json({
+                success:false,
+                message:"Error while creating the account."
+            })
+        }
+    })
 };
 
 module.exports = {signUp : signupHandler};
