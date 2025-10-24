@@ -14,11 +14,11 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  verfied : {
+  verified : {
     type: Boolean,
     default: false,
   }
-});
+}, { timestamps: true });
 
 const User = mongoose.model("users", UserSchema);
 

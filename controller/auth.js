@@ -19,6 +19,7 @@ const signupHandler = async (req,res) => {
     const emailCheck = await User.findOne({ email: email });
 
     if (emailCheck) {
+        console.log(emailCheck.verified)
         if (emailCheck.verified === false) {
             // Update the existing unverified user with new name and password
             bcrypt.hash(password, saltRounds, async function (err, hash) {
@@ -54,7 +55,7 @@ const signupHandler = async (req,res) => {
                     message: "Error while hashing password."
                 });
             }
-            const user = new User({ name, email, passwordHash: hash });
+            const user = new User({ name, email, passwordHash: hash, verified: false });
             const response = await user.save();
             if (response) {
                 return res.status(200).json({
