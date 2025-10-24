@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const { User }  = require("./../models/auth");
-const { success } = require("zod");
 
 const saltRounds = 10;
 
@@ -19,7 +18,6 @@ const signupHandler = async (req,res) => {
     const emailCheck = await User.findOne({ email: email });
 
     if (emailCheck) {
-        console.log(emailCheck.verified)
         if (emailCheck.verified === false) {
             // Update the existing unverified user with new name and password
             bcrypt.hash(password, saltRounds, async function (err, hash) {
