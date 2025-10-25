@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
 
 const otpSchema = mongoose.Schema({
-    hashedOtp : {
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    hashedOtp: {
         type: String,
         required: true
     },
-    isUsed : {
+    isUsed: {
         type: Boolean,
         default: false
     },
@@ -14,8 +19,8 @@ const otpSchema = mongoose.Schema({
         default: Date.now,
         expires: 300 // 5 minutes
     }
-}, { timestamps : true })
+}, { timestamps: true })
 
 const OTP = mongoose.model("OTP", otpSchema);
 
-module.exports = {OTP};
+module.exports = { OTP };
