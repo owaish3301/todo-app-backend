@@ -26,7 +26,7 @@ const validateSignUpInputs = (req, res, next) => {
       });
     }
 
-    throw new Error("An internal server error occurred during validation.");
+    throw new Error("An internal server error occurred during validation");
   }
 };
 

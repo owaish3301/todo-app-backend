@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const { connectMongo } = require("./connection");
 const { authRouter } = require("./routes/auth");
+const { globalErrorHandler } = require("./middlewares/globalErrorHandler");
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use(cookieparser());
 
 
 app.use('/api/auth',authRouter)
+
+app.use(globalErrorHandler);
 
 app.listen(3000,()=>{
     console.log("Server running on 3000");

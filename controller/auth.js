@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const { User }  = require("./../models/auth");
+const { otpHandler } = require("../utils/otpHandler");
 
 const saltRounds = 10;
 
@@ -22,18 +23,19 @@ const signupHandler = async (req,res) => {
             // Update the existing unverified user with new name and password
             bcrypt.hash(password, saltRounds, async function (err, hash) {
                 if (err) {
-                    return res.status(500).json({
-                        success: false,
-                        message: "Error while hashing password."
-                    });
+                    throw new Error("Error while hashing password");
                 }
+
+
                 emailCheck.name = name;
                 emailCheck.passwordHash = hash;
                 await emailCheck.save();
 
+                otpHandler(to=email, name=name);
+
                 return res.status(200).json({
                   success: true,
-                  message: "Account created successfully.",
+                  message: "Account created successfully",
                   verified: emailCheck.verified,
                 });
             });
@@ -48,24 +50,20 @@ const signupHandler = async (req,res) => {
     } else {
         bcrypt.hash(password, saltRounds, async function (err, hash) {
             if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: "Error while hashing password."
-                });
+                throw new Error("Error while hashing password");
             }
+            
             const user = new User({ name, email, passwordHash: hash, verified: false });
             const response = await user.save();
             if (response) {
+                otpHandler((to = email), (name = name));
                 return res.status(200).json({
                     success: true,
-                    message: "Account created successfully.",
+                    message: "Account created successfully",
                     verified: response.verified
                 });
             } else {
-                return res.status(400).json({
-                    success: false,
-                    message: "Error while creating the account."
-                });
+                throw new Error("An error occured while creating account")
             }
         });
     }
