@@ -26,12 +26,7 @@ const validateSignUpInputs = (req, res, next) => {
       });
     }
 
-    // TODO: save error log
-    // TODO: raise error from here and let the global catch handle it
-    return res.status(500).json({
-      success: false,
-      message: "An internal server error occurred during validation.",
-    });
+    throw new Error("An internal server error occurred during validation.");
   }
 };
 
