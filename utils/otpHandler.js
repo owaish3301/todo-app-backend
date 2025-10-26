@@ -39,8 +39,7 @@ const otpHandler = async (to, name) => {
     await SendEmail(to, OtpSubject, OtpText);
 
   } catch (err) {
-    console.error("OTP Handler Error:", err.message);
-    throw err; // rethrow so signupHandler can catch it
+    throw err; 
   }
 };
 

@@ -10,6 +10,7 @@ const signupHandler = async (req, res) => {
     const { name, email, password } = req.body;
     const emailCheck = await User.findOne({ email });
 
+    // TODO: If otp is not expired yet send back the response with saying to try again in X seconds
     // Case 1: user exists but not verified yet
     if (emailCheck && emailCheck.verified === false) {
       const hash = await bcrypt.hash(password, saltRounds);
