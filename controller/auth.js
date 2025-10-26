@@ -61,7 +61,7 @@ const signupHandler = async (req, res) => {
     await otpHandler(email, name);
     return res.status(200).json({
       success: true,
-      message: "Account created successfully",
+      message: "Please submit the OTP sent to your email to verify your account.",
       verified: response.verified,
     });
   } catch (err) {
