@@ -12,22 +12,25 @@ const signupHandler = async (req, res) => {
     const user = await User.findOne({ email });
 
     // Case 1: user exists but not verified yet
-    // TODO: fix race condition if two request comes at the same time they might pass the otp rate limits
     if (user && user.verified === false) {
-      // Find latest OTP for this user
-      const latestOtp = await OTP.findOne({ user: user._id, isUsed: false }).sort({ createdAt: -1 });
-      if (latestOtp) {
-        const now = Date.now();
-        const otpCreated = latestOtp.createdAt.getTime();
-        const expiresInMs = 5 * 60 * 1000; // 5 minutes
-        const timeLapsed = now - otpCreated;
-        if (timeLapsed < expiresInMs) {
-          const secondsLeft = Math.ceil((expiresInMs - timeLapsed) / 1000);
-          return res.status(400).json({
-            success: false,
-            message: `Try again in ${secondsLeft} seconds`
-          });
-        }
+      // Atomic check for recent OTPs to prevent race conditions
+      const now = new Date();
+      const expiresInMs = 5 * 60 * 1000; // 5 minutes
+      const fiveMinutesAgo = new Date(now.getTime() - expiresInMs);
+      
+      // Find the most recent OTP created in the last 5 minutes
+      const recentOtp = await OTP.findOne({
+        user: user._id,
+        createdAt: { $gte: fiveMinutesAgo }
+      }).sort({ createdAt: -1 });
+
+      if (recentOtp) {
+        const timeLapsed = now - recentOtp.createdAt;
+        const secondsLeft = Math.ceil((expiresInMs - timeLapsed) / 1000);
+        return res.status(400).json({
+          success: false,
+          message: `Try again in ${secondsLeft} seconds`
+        });
       }
       const hash = await bcrypt.hash(password, saltRounds);
       user.name = name;
@@ -36,7 +39,8 @@ const signupHandler = async (req, res) => {
       await otpHandler(email, name);
       return res.status(200).json({
         success: true,
-        message: "Account created successfully",
+        message:
+          "Please submit the OTP sent to your email to verify your account.",
         verified: user.verified,
       });
     }
@@ -45,7 +49,7 @@ const signupHandler = async (req, res) => {
     if (user) {
       return res.status(400).json({
         success: false,
-        message: "Email already exists",
+        message: "Account already exists",
       });
     }
 
@@ -61,7 +65,7 @@ const signupHandler = async (req, res) => {
     await otpHandler(email, name);
     return res.status(200).json({
       success: true,
-      message: "Please submit the OTP sent to your email to verify your account.",
+      message: "Please submit the OTP sent to your email to verify your account",
       verified: response.verified,
     });
   } catch (err) {
