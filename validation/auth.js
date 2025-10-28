@@ -1,7 +1,10 @@
 const { z } = require("zod");
 
-const emailSchema = z.email("Invalid email format.");
-const nameSchema = z.string().min(1, "Name can't be empty.");
+const emailSchema = z.email({
+  error: (e) =>
+    e.input === undefined ? "Email is required" : "Invalid email address",
+});
+const nameSchema = z.string({error:(e)=>e.input===undefined ? "Name is required": "Invalid name input"}).min(1, "Name can't be empty.");
 
 
 const passwordRequirements =
@@ -10,10 +13,10 @@ const passwordRequirements =
   "(?=.*[^a-zA-Z0-9])" + // Must contain a symbol
   ".*";
 
-const passwordSchema = z
+const passwordSchema = z.coerce
   .string({
-    required_error: "Password is required.",
-    invalid_type_error: "Password must be a string.",
+    error: (e) =>
+      e.input === undefined ? "Password is required" : "Invalid password",
   })
   .min(6, "Password must be at least 6 characters long.")
   .regex(
