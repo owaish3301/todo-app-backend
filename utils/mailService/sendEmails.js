@@ -20,7 +20,7 @@ const SendEmail = async (to, subject, text) => {
   try {
     await transporter.sendMail(mailOptions);
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error("Error sending verification email: " + error.message);
   }
 }
 
