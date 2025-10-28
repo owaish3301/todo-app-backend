@@ -1,12 +1,11 @@
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { User } = require("./../models/auth");
+const { User } = require("../models/auth");
 const { otpHandler } = require("../utils/otpHandler");
 const { OTP } = require("../models/otp");
 
 const saltRounds = 10;
 
-const signupHandler = async (req, res) => {
+const signupHandler = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const user = await User.findOne({ email });
@@ -68,8 +67,9 @@ const signupHandler = async (req, res) => {
       message: "Please submit the OTP sent to your email to verify your account",
       verified: response.verified,
     });
+    // TODO: error handling here needs extensive reviews
   } catch (err) {
-    throw new Error("An internal server error occured")
+    next(err);
   }
 };
 
