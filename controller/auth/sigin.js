@@ -1,4 +1,6 @@
 const { User } = require("../../models/auth");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const signInController = async (req,res,next) => {
     /*
@@ -12,7 +14,7 @@ const signInController = async (req,res,next) => {
     */
    try{
     const { email, password } = req.body;
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
 
     /*
     users may not be verified by otp
@@ -23,6 +25,37 @@ const signInController = async (req,res,next) => {
         but send back the verified is false flag
              for the frontend to be able to detect it and handle on client side
     */
+
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if(!match){
+        return res.status(400).json({
+            success: false,
+            message: "Wrong password"
+        })
+    }
+
+    const payload = {
+        name: user.name,
+        email,
+        verified: user.verified,
+    }
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+    return res
+        .cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 24 * 60 * 60 * 1000
+        })
+        .status(200)
+        .json({
+            success: true,
+            message: "Account created",
+            user: payload
+    });
+
    } catch(e){
     next(e)
    }
