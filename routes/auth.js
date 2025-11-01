@@ -1,14 +1,14 @@
 const express = require("express");
-const { validateSignUpInputs } = require("../middlewares/signup");
-const { signUp } = require("../controller/signup");
+const { validateEmailAndPassword, validateNameInput } = require("../middlewares/auth");
+const { signUp } = require("../controller/auth/signup");
 const { validateOtpInput } = require("../middlewares/otp");
-const {  otpController } = require("../controller/otp");
+const {  otpController } = require("../controller/auth/otp");
 
 
 const Router = express.Router();
 
-Router.post("/signup", validateSignUpInputs, signUp);
+Router.post("/signup", validateEmailAndPassword, validateNameInput, signUp);
 Router.post("/verifyOtp", validateOtpInput, otpController);
-
+Router.post("/signin", validateEmailAndPassword, );
 
 module.exports = {authRouter:Router};
