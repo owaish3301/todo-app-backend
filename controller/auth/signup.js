@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
-const { User } = require("../models/auth");
-const { otpHandler } = require("../utils/otpHandler");
-const { OTP } = require("../models/otp");
+const { User } = require("../../models/auth");
+const { otpHandler } = require("../../utils/otpHandler");
+const { OTP } = require("../../models/otp");
 
 const saltRounds = 10;
 

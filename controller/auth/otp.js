@@ -2,8 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const { User } = require("../models/auth");
-const { OTP } = require("../models/otp");
+const { User } = require("../../models/auth");
+const { OTP } = require("../../models/otp");
 
 const otpController = async (req, res, next) => {
     const session = await User.startSession();
