@@ -36,6 +36,7 @@ function validateNameInput(req,res,next){
       message: nameResult.error.issues[0]?.message || "Invalid name input",
     });
   }
+  next();
 }
 
 // const validateSignUpInputs = (req, res, next) => {

@@ -1,6 +1,7 @@
 const { User } = require("../../models/auth");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { otpHandler } = require("../../utils/otpHandler");
 
 const signInController = async (req,res,next) => {
     /*
@@ -22,6 +23,7 @@ const signInController = async (req,res,next) => {
     case 1:
         verified user -> let them signin
         unverified user -> let them signin normally 
+        and generate an otp
         but send back the verified is false flag
              for the frontend to be able to detect it and handle on client side
     */
@@ -33,7 +35,9 @@ const signInController = async (req,res,next) => {
             message: "Wrong password"
         })
     }
-
+    if (!user.verified) {
+      await otpHandler(email, user.name);
+    }
     const payload = {
         name: user.name,
         email,
@@ -52,7 +56,7 @@ const signInController = async (req,res,next) => {
         .status(200)
         .json({
             success: true,
-            message: "Account created",
+            message: "Login Successful",
             user: payload
     });
 
@@ -60,3 +64,5 @@ const signInController = async (req,res,next) => {
     next(e)
    }
 }
+
+module.exports = { signInController };
