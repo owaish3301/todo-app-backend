@@ -1,0 +1,9 @@
+{
+    "type": "node",
+    "request": "launch",
+    "name": "Debug Express",
+    "program": "${workspaceFolder}/index.js",
+    "runtimeArgs": [
+        "--inspect"
+    ]
+}
