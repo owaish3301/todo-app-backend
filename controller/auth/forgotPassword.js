@@ -2,7 +2,7 @@ const { User } = require("../../models/auth");
 const { otpHandler } = require("../../utils/otpHandler");
 const jwt = require("jsonwebtoken");
 const { OTP } = require("../../models/otp");
-const bcrypt = require("bcrypt");const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 
 async function handleResetPassMail(req, res, next) {
     /*
@@ -115,4 +115,51 @@ async function verifyOtp(req,res,next) {
     }
 }
 
-module.exports = {handleResetPassMail, verifyResetPassOtp:verifyOtp}
+async function updatePassword(req,res,next) {
+  /*
+  get the token and email and password
+  check user exists
+  verify the token 
+  geneerate hash for the password
+  store it and return
+  */  
+
+  const {email, password, resetToken} = req.body;
+  const user = await User.findOne({email});
+  if(!user){
+    return res.status(400).json({
+      success:false,
+      message:"Account does not exist with the given email"
+    })
+  }
+  try{
+    const decodedToken = jwt.verify(resetToken,process.env.JWT_SECRET);
+    if(decodedToken.isPassResetToken){
+      const hash = await bcrypt.hash(password, 10);
+      user.passwordHash = hash;
+      const payload = {email, name:user.name}
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:'24h'});
+      await user.save();
+      return res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .status(200)
+        .json({
+          success: true,
+          message: "Password updated successfully",
+        });
+    }
+  }catch(e){
+    return res.status(400).json({
+      success:false,
+      message:"Error occured. Try resetting the password again"
+    })
+  }
+  
+}
+
+module.exports = {handleResetPassMail, verifyResetPassOtp:verifyOtp, updatePassword}
