@@ -14,5 +14,6 @@ Router.post("/verifyOtp", validateOtpInput, otpController);
 Router.post("/signin", validateEmailAndPassword, signInController);
 Router.post("/forgotPassword", validateEmail, handleResetPassMail);
 Router.post("/verifyResetPassword", validateEmail, verifyResetPassOtp);
+Router.post("/updatePassword", validateEmailAndPassword, );
 
 module.exports = {authRouter:Router};

@@ -94,12 +94,20 @@ async function verifyOtp(req,res,next) {
       const match = await bcrypt.compare(otp, otpResponse.hashedOtp);
       if (match) {
         otpResponse.isUsed = true;
+        await otpResponse.save();
+
         const payload = {email, isPassResetToken:true}
         const token = jwt.sign(payload,process.env.JWT_SECRET, {expiresIn:"5m"});
         return res.status(200).json({
           success:true,
           message:"Otp verified, enter a new password",
           token
+        })
+      }
+      else{
+        return res.status(400).json({
+          success: false,
+          message:"Invalid Otp. Try again"
         })
       }
     }catch(e){
