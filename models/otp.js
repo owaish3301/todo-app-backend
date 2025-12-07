@@ -21,7 +21,6 @@ const otpSchema = mongoose.Schema({
     }
 }, { timestamps: true })
 
-// TODO: Add attempt tracker for rate limiting
 
 const OTP = mongoose.model("OTP", otpSchema);
 
