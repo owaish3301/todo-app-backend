@@ -5,6 +5,8 @@ const { signInController } = require("../controller/auth/sigin");
 const { validateOtpInput } = require("../middlewares/otp");
 const {  otpController } = require("../controller/auth/otp");
 const { handleResetPassMail, verifyResetPassOtp, updatePassword } = require("../controller/auth/forgotPassword");
+const { verifyToken } = require("../middlewares/verifyToken");
+const { verify } = require("../controller/auth/verify");
 
 
 const Router = express.Router();
@@ -15,5 +17,6 @@ Router.post("/signin", validateEmailAndPassword, signInController);
 Router.post("/forgotPassword", validateEmail, handleResetPassMail);
 Router.post("/verifyResetPassword", validateEmail, verifyResetPassOtp);
 Router.post("/updatePassword", validateEmailAndPassword, updatePassword);
+Router.get("/verify", verifyToken, verify);
 
 module.exports = {authRouter:Router};
