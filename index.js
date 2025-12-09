@@ -5,6 +5,7 @@ const cors = require('cors');
 const { connectMongo } = require("./connection");
 const { authRouter } = require("./routes/auth");
 const { globalErrorHandler } = require("./middlewares/globalErrorHandler");
+const { todosRouter } = require("./routes/todos");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cookieparser());
 
 
 app.use('/api/auth',authRouter)
+app.use('/api/todos',todosRouter);
 
 app.use(globalErrorHandler);
 
